@@ -8,6 +8,7 @@ class SongsHandler {
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.putSongHandler = this.putSongHandler.bind(this);
   }
 
   async postSongHandler(request, h) {
@@ -82,6 +83,50 @@ class SongsHandler {
         },
       });
       response.code(200);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
+  }
+
+  async putSongHandler(request, h) {
+    try {
+      await this._validator.validateSongPayload(request.payload);
+      const {
+        title, year, performer, genre, duration, albumId,
+      } = request.payload;
+      const { id } = request.params;
+
+      await this._service.editSongById(id, {
+        id,
+        title,
+        year,
+        performer,
+        genre,
+        duration,
+        albumId,
+      });
+
+      const response = h.response({
+        status: 'success',
+        message: 'Lagu berhasil diubah',
+      });
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
