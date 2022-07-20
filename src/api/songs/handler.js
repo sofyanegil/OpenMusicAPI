@@ -6,6 +6,7 @@ class SongsHandler {
     this._validator = validator;
 
     this.postSongHandler = this.postSongHandler.bind(this);
+    this.getSongsHandler = this.getSongsHandler.bind(this);
   }
 
   async postSongHandler(request, h) {
@@ -17,7 +18,12 @@ class SongsHandler {
       } = request.payload;
 
       const songId = await this._service.addSong({
-        title, year, performer, genre, duration, albumId,
+        title,
+        year,
+        performer,
+        genre,
+        duration,
+        albumId,
       });
 
       const response = h.response({
@@ -47,6 +53,19 @@ class SongsHandler {
       console.error(error);
       return response;
     }
+  }
+
+  async getSongsHandler(reqest, h) {
+    const songs = await this._service.getSongs(reqest.query);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        songs,
+      },
+    });
+    response.code(200);
+    return response;
   }
 }
 

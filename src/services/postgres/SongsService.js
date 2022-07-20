@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
+const { mapDBToModelSongs } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -24,6 +25,41 @@ class SongsService {
     }
 
     return result.rows[0].id;
+  }
+
+  async getSongs({ title, performer }) {
+    let query;
+
+    if (title) {
+      query = {
+        text: 'SELECT * FROM songs WHERE title ILIKE $1',
+        values: [`%${title}%`],
+      };
+    }
+
+    if (performer) {
+      query = {
+        text: 'SELECT * FROM songs WHERE performer ILIKE $1',
+        values: [`%${performer}%`],
+      };
+    }
+
+    if (title && performer) {
+      query = {
+        text: 'SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+        values: [`%${title}%`, `%${performer}%`],
+      };
+    }
+
+    if (!title && !performer) {
+      query = {
+        text: 'SELECT * FROM songs',
+      };
+    }
+
+    const result = await this._pool.query(query);
+
+    return result.rows.map(mapDBToModelSongs);
   }
 }
 
