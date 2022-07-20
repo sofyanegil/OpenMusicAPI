@@ -16,14 +16,6 @@ exports.up = (pgm) => {
       type: 'INTEGER',
       notNull: true,
     },
-    created_at: {
-      type: 'TIMESTAMP',
-      notNull: true,
-    },
-    updated_at: {
-      type: 'TIMESTAMP',
-      notNull: true,
-    },
   });
 };
 
