@@ -7,6 +7,7 @@ class SongsHandler {
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
   }
 
   async postSongHandler(request, h) {
@@ -66,6 +67,41 @@ class SongsHandler {
     });
     response.code(200);
     return response;
+  }
+
+  async getSongByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+
+      const song = await this._service.getSongById(id);
+
+      const response = h.response({
+        status: 'success',
+        data: {
+          song,
+        },
+      });
+      response.code(200);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 }
 
