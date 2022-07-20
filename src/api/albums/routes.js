@@ -11,7 +11,7 @@ const routes = (handler) => [
   },
   {
     method: 'PUT',
-    path: '/albums',
+    path: '/albums/{id}',
     handler: handler.putAlbumHandler,
   },
   {
