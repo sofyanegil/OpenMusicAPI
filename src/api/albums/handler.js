@@ -8,6 +8,7 @@ class AlbumsHandler {
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
     this.putAlbumHandler = this.putAlbumHandler.bind(this);
+    this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -93,6 +94,39 @@ class AlbumsHandler {
       const response = h.response({
         status: 'success',
         message: 'Album berhasil diubah',
+      });
+
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
+  }
+
+  async deleteAlbumByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+
+      await this._service.deleteAlbumById(id);
+
+      const response = h.response({
+        status: 'success',
+        message: 'Album berhasil dihapus',
       });
 
       return response;
