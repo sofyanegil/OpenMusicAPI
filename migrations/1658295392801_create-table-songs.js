@@ -12,11 +12,11 @@ exports.up = (pgm) => {
       type: 'INTEGER',
       notNull: true,
     },
-    performer: {
-      type: 'VARCHAR(180)',
+    genre: {
+      type: 'VARCHAR(50)',
       notNull: true,
     },
-    genre: {
+    performer: {
       type: 'VARCHAR(180)',
       notNull: true,
     },

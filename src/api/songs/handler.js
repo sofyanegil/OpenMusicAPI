@@ -15,16 +15,14 @@ class SongsHandler {
   async postSongHandler(request, h) {
     try {
       await this._validator.validateSongPayload(request.payload);
-
       const {
-        title, year, performer, genre, duration, albumId,
+        title, year, genre, performer, duration, albumId,
       } = request.payload;
-
       const songId = await this._service.addSong({
         title,
         year,
-        performer,
         genre,
+        performer,
         duration,
         albumId,
       });
@@ -43,7 +41,6 @@ class SongsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -74,7 +71,6 @@ class SongsHandler {
   async getSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
-
       const song = await this._service.getSongById(id);
 
       const response = h.response({
@@ -91,7 +87,6 @@ class SongsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -110,16 +105,15 @@ class SongsHandler {
     try {
       await this._validator.validateSongPayload(request.payload);
       const {
-        title, year, performer, genre, duration, albumId,
+        title, year, genre, performer, duration, albumId,
       } = request.payload;
       const { id } = request.params;
-
       await this._service.editSongById(id, {
         id,
         title,
         year,
-        performer,
         genre,
+        performer,
         duration,
         albumId,
       });
@@ -135,7 +129,6 @@ class SongsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -153,7 +146,6 @@ class SongsHandler {
   async deleteSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
-
       await this._service.deleteSongById(id);
 
       const response = h.response({
@@ -167,7 +159,6 @@ class SongsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
