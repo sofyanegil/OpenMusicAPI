@@ -14,9 +14,7 @@ class AlbumsHandler {
   async postAlbumHandler(request, h) {
     try {
       await this._validator.validateAlbumPayload(request.payload);
-
       const { name, year } = request.payload;
-
       const albumId = await this._service.addAlbum({ name, year });
 
       const response = h.response({
@@ -33,7 +31,6 @@ class AlbumsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -51,13 +48,13 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request, h) {
     try {
       const { id } = request.params;
-
       const album = await this._service.getAlbumById(id);
+      const songs = await this._service.getSongsByAlbumId(id);
 
       const response = h.response({
         status: 'success',
         data: {
-          album,
+          album: { ...album, songs },
         },
       });
       response.code(200);
@@ -68,7 +65,6 @@ class AlbumsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -88,14 +84,12 @@ class AlbumsHandler {
       await this._validator.validateAlbumPayload(request.payload);
       const { name, year } = request.payload;
       const { id } = request.params;
-
       await this._service.editAlbumById(id, { name, year });
 
       const response = h.response({
         status: 'success',
         message: 'Album berhasil diubah',
       });
-
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
@@ -103,7 +97,6 @@ class AlbumsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
@@ -121,14 +114,12 @@ class AlbumsHandler {
   async deleteAlbumByIdHandler(request, h) {
     try {
       const { id } = request.params;
-
       await this._service.deleteAlbumById(id);
 
       const response = h.response({
         status: 'success',
         message: 'Album berhasil dihapus',
       });
-
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
@@ -136,7 +127,6 @@ class AlbumsHandler {
           status: 'fail',
           message: error.message,
         });
-
         response.code(error.statusCode);
         return response;
       }
