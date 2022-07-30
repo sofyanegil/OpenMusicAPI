@@ -6,11 +6,12 @@ const AuthorizationError = require('../../exceptions/AuthorizationError');
 const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsService {
-  constructor(collaborationsService, activitiesService) {
+  constructor(collaborationsService, activitiesService, cacheService) {
     this._pool = new Pool();
 
     this._collaborationsService = collaborationsService;
     this._activitiesService = activitiesService;
+    this._cacheService = cacheService;
   }
 
   async addPlaylist({ name, owner }) {
@@ -75,25 +76,32 @@ class PlaylistsService {
     const action = 'add';
     const userId = credentialId;
     await this._activitiesService.addPlaylistActivity(playlistId, songId, userId, action);
+    await this._cacheService.delete(`playlist:${playlistId}`);
   }
 
   async getPlaylistSongs(id, owner) {
-    let playlist = await this.getPlaylists(owner);
+    try {
+      const result = await this._cacheService.get(`playlist:${id}`);
+      return JSON.parse(result);
+    } catch (error) {
+      let playlist = await this.getPlaylists(owner);
 
-    playlist = playlist.find((p) => p.id === id);
-    const query = {
-      text: `SELECT songs.id, songs.title, songs.performer FROM playlist_songs 
+      playlist = playlist.find((p) => p.id === id);
+      const query = {
+        text: `SELECT songs.id, songs.title, songs.performer FROM playlist_songs 
             INNER JOIN songs ON playlist_songs.song_id = songs.id
             INNER JOIN playlists ON playlist_songs.playlist_id = playlists.id
             WHERE playlist_songs.playlist_id = $1`,
-      values: [id],
-    };
+        values: [id],
+      };
 
-    const result = await this._pool.query(query);
+      const result = await this._pool.query(query);
 
-    playlist.songs = result.rows;
+      playlist.songs = result.rows;
 
-    return playlist;
+      await this._cacheService.set(`playlist:${id}`, JSON.stringify(playlist));
+      return playlist;
+    }
   }
 
   async deleteSongFromPlaylist(playlistId, songId, credentialId) {
@@ -111,6 +119,8 @@ class PlaylistsService {
     if (!result.rowCount) {
       throw new ClientError('Gagal menghapus lagu dari playlist');
     }
+
+    await this._cacheService.delete(`playlist:${playlistId}`);
   }
 
   async checkSongsExist(id) {
