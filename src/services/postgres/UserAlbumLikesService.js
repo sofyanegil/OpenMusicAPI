@@ -4,7 +4,7 @@ const InvariantError = require('../../exceptions/InvariantError');
 
 class UserAlbumLikes {
   constructor(cacheService) {
-    this._pool = new Pool();
+    this._pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
     this._cacheService = cacheService;
   }
 

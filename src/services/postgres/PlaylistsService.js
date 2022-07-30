@@ -7,7 +7,7 @@ const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsService {
   constructor(collaborationsService, activitiesService, cacheService) {
-    this._pool = new Pool();
+    this._pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
     this._collaborationsService = collaborationsService;
     this._activitiesService = activitiesService;
