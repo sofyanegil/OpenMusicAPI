@@ -19,7 +19,7 @@ class UploadsHandler {
       const filename = await this._service.writeFile(data, data.hapi);
       const filepath = `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`;
 
-      this._albumsService.addCover(albumId, filepath);
+      await this._albumsService.addAlbumCover(albumId, filepath);
 
       const response = h.response({
         status: 'success',
